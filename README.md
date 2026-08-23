@@ -1,73 +1,87 @@
-# React + TypeScript + Vite
+# 読 — setup
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Two deploys, both free, about five minutes total.
 
-Currently, two official plugins are available:
+- **Worker** — holds your Anthropic API key and stores your progress. Without it the app still runs, but only on the four passages that ship with it.
+- **Pages** — serves the app itself.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 1. The Worker
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Create a KV namespace and deploy:
 
-## Expanding the ESLint configuration
+```bash
+npm install -g wrangler
+wrangler login
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+wrangler kv namespace create YOMI        # note the id it prints
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Create `wrangler.toml` next to `worker.js`:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```toml
+name = "yomi"
+main = "worker.js"
+compatibility_date = "2026-01-01"
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+[[kv_namespaces]]
+binding = "YOMI"
+id = "PASTE_THE_ID_HERE"
 ```
+
+Set the two secrets, then deploy:
+
+```bash
+wrangler secret put ANTHROPIC_API_KEY   # from console.anthropic.com
+wrangler secret put TOKEN               # any long random string you invent
+wrangler deploy
+```
+
+It prints a URL like `https://yomi.yourname.workers.dev`. Keep that and the TOKEN.
+
+## 2. The app
+
+This repo deploys `index.html`, `manifest.webmanifest`, and `sw.js` to GitHub Pages automatically on push to `main` (see `.github/workflows/deploy.yml`). No build step.
+
+Any static host works equally well — Netlify drop, Cloudflare Pages, whatever you already use.
+
+## 3. Connect
+
+Open the app → **設定** → paste the Worker URL and TOKEN → 保存して接続を確認.
+
+Do this once on each device. The token is the only thing linking them; same token, same progress.
+
+## 4. Home screen
+
+- **iPhone:** Safari → Share → Add to Home Screen
+- **Mac/desktop Chrome:** address bar → install icon
+
+It then opens like an app, full screen, no browser chrome. The service worker caches the shell, so it launches in a tunnel — passages you already have work offline; new ones and word lookups need signal.
+
+## 5. Icon
+
+`manifest.webmanifest` references `icon.svg` at the site root. Add your own square SVG there (any viewBox works — `purpose: "any maskable"` means iOS/Android will crop it to a circle/rounded-square, so keep the important art centered with some margin). Until it exists, the app works fine — only the home-screen icon will be a browser default.
+
+---
+
+## Costs
+
+Cloudflare's free tier covers this many times over. The Anthropic usage is the only real cost: four short passages a day is a few cents a month.
+
+## If something breaks
+
+- **"トークンが違います"** — the TOKEN in 設定 doesn't match the Worker secret.
+- **"URL に到達できません"** — check the Worker URL, no trailing slash.
+- **Passages won't refresh** — 設定 → 本文を初期化 resets the text and keeps your streak.
+- **Devices disagree** — 設定 → 今すぐ同期 on both. Merging is additive; nothing is lost, though two devices pushing within the same instant can still race (see below).
+
+## Known limitations
+
+- **Sync has no locking.** `/sync` is a plain read-merge-write; two devices pushing in the same instant can still clobber each other, though this is very unlikely with normal phone/laptop use.
+- **The shared token is the only access control.** Anyone who has it can spend your Anthropic budget through `/api`. Keep it private; there's no rate limiting.
+- **Dwell time has no on-screen indicator.** A passage needs ~9 seconds on screen to count toward the day; tapping 次へ before that silently doesn't credit it.
+
+## Where your data lives
+
+`localStorage` on each device, plus one KV entry on your own Cloudflare account. Nobody else's servers, no accounts, no telemetry.
