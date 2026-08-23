@@ -73,6 +73,7 @@ Cloudflare's free tier covers this many times over. The Anthropic usage is the o
 
 - **"トークンが違います"** — the TOKEN in 設定 doesn't match the Worker secret.
 - **"URL に到達できません"** — check the Worker URL, no trailing slash.
+- **"サーバーが応答しません"** — the Worker answered but not with a success. Usually the URL points somewhere real that isn't your Worker. Confirm the field actually holds your Worker URL: the grey `https://yomi.you.workers.dev` is placeholder text shown when the field is *empty*, not a saved value.
 - **Passages won't refresh** — 設定 → 本文を初期化 resets the text and keeps your streak.
 - **Devices disagree** — 設定 → 今すぐ同期 on both. Merging is additive; nothing is lost, though two devices pushing within the same instant can still race (see below).
 

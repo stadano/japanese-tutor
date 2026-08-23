@@ -254,6 +254,10 @@ let cfg = { url: "", token: "" };
 let view = "home";
 let gloss = null, marks = false, pending = null, busy = false, step = 0;
 let note = null, flashMsg = null, tappedNow = {}, enter = Date.now(), syncedAt = null;
+/* What is typed in 設定 but not yet saved. A render rebuilds the whole view,
+   so without this anything half-entered is lost — including when the app
+   re-renders on its own after you switch away to fetch a URL or token. */
+let draft = null;
 
 const LS = "yomi-v2", LSC = "yomi-cfg";
 
@@ -345,7 +349,8 @@ async function pull() {
   try {
     const r = await fetch(base() + "/sync", { headers: { "X-Yomi-Token": cfg.token } });
     if (!r.ok) throw new Error("sync");
-    const remote = JSON.parse(await r.json());
+    /* The worker sends the stored state as the body, so this is already parsed. */
+    const remote = await r.json();
     if (remote) { S = mergeState(remote, S); saveLocal(); }
     syncedAt = Date.now();
   } catch (e) { /* offline is fine; local keeps working */ }
@@ -357,7 +362,7 @@ async function push() {
   try {
     const r = await fetch(base() + "/sync", { headers: { "X-Yomi-Token": cfg.token } });
     if (r.ok) {
-      const remote = JSON.parse(await r.json());
+      const remote = await r.json();
       if (remote) S = mergeState(remote, S);
     }
     await fetch(base() + "/sync", {
@@ -763,12 +768,13 @@ function wordsView() {
 function setView() {
   const tracked = Object.keys(S.known).length;
   const settled = Object.values(S.known).filter(v => v.strength >= 3).length;
+  const d = draft || cfg;
   return `<div class="pad">
     <div class="hint">サーバーを登録すると、新しい本文の生成と、端末間の同期が有効になります。README の手順で五分ほどです。</div>
     <label>SERVER URL</label>
-    <input id="url" value="${esc(cfg.url)}" placeholder="https://yomi.you.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <input id="url" value="${esc(d.url)}" placeholder="https://yomi.you.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
     <label>TOKEN</label>
-    <input id="token" value="${esc(cfg.token)}" type="password" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <input id="token" value="${esc(d.token)}" type="password" autocapitalize="off" autocorrect="off" spellcheck="false">
     <div class="row2">
       <button class="ghost" id="save">保存して接続を確認</button>
       <button class="ghost" id="sync">今すぐ同期</button>
@@ -788,6 +794,10 @@ function setView() {
 }
 
 function render() {
+  /* Keep whatever is typed in 設定 before the view is rebuilt under it. */
+  const uEl = document.getElementById("url"), tEl = document.getElementById("token");
+  if (uEl && tEl) draft = { url: uEl.value, token: tEl.value };
+
   const streak = currentStreak();
   document.getElementById("hdr").innerHTML =
     `<span style="color:${streak ? "var(--shu)" : "var(--sumi-dim)"}">連続 ${streak}日</span>`;
@@ -851,15 +861,26 @@ function bind() {
     });
 
   on("save", async () => {
-    cfg.url = document.getElementById("url").value.trim();
-    cfg.token = document.getElementById("token").value.trim();
-    saveCfg();
+    const urlEl = document.getElementById("url");
     const msg = document.getElementById("setmsg");
+
+    /* A bare host is the common paste. Without a scheme the browser treats it
+       as a relative path and quietly asks this site instead of the worker. */
+    let u = urlEl.value.trim().replace(/\/+$/, "");
+    if (u && !/^https?:\/\//i.test(u)) u = "https://" + u;
+    urlEl.value = u;
+
+    const t = document.getElementById("token").value.trim();
+    if (!u) { msg.textContent = "URL を入力してください。"; return; }
+    if (!t) { msg.textContent = "トークンを入力してください。"; return; }
+
+    cfg.url = u; cfg.token = t;
+    saveCfg();
     msg.textContent = "確認中…";
     try {
       const r = await fetch(base() + "/sync", { headers: { "X-Yomi-Token": cfg.token } });
       msg.textContent = r.ok ? "接続できました。" : r.status === 401 ? "トークンが違います。" : "サーバーが応答しません。";
-      if (r.ok) { await pull(); render(); }
+      if (r.ok) { draft = null; await pull(); render(); }
     } catch (e) { msg.textContent = "URL に到達できません。"; }
   });
 
