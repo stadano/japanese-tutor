@@ -1,0 +1,12 @@
+{
+  "name": "読 — Japanese reading",
+  "short_name": "読",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#E7E5DD",
+  "theme_color": "#E7E5DD",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

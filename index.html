@@ -1,14 +1,912 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E7E5DD">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="読">
+<link rel="manifest" href="manifest.webmanifest">
+<title>読</title>
+<style>
+  :root{
+    --paper:#E7E5DD; --paper-deep:#DCD9CF; --sumi:#22231E; --sumi-mid:#5A5B52;
+    --sumi-dim:#8D8E84; --ai:#2F4B7C; --shu:#B33B2B; --rule:#C9C5B8;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+    --gothic:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic Medium",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--paper); color:var(--sumi); font-family:var(--gothic);
+    display:flex; flex-direction:column;
+    padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
+    overscroll-behavior:none;
+  }
+  header{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 18px 10px; border-bottom:1px solid var(--rule); flex-shrink:0;
+  }
+  .logo{font:500 18px var(--mincho); letter-spacing:.2em}
+  .meta{font:400 10px var(--mono); color:var(--sumi-dim); letter-spacing:.12em}
+  .spacer{margin-left:auto}
+  main{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  button{font-family:inherit; cursor:pointer}
+  .ghost{
+    background:none; border:1px solid var(--rule); border-radius:3px;
+    color:var(--sumi-mid); font:400 11px var(--gothic); padding:5px 10px;
+  }
+  .ghost.on{border-color:var(--sumi-dim); background:var(--paper-deep); color:var(--sumi)}
+  .ghost.hot{border-color:var(--shu); color:var(--shu)}
+  .solid{
+    width:100%; padding:17px; background:var(--sumi); border:none; border-radius:3px;
+    color:var(--paper); font:500 15px var(--mincho); letter-spacing:.14em;
+  }
+  .solid[disabled]{opacity:.45}
+  .wide{
+    width:100%; padding:12px; background:none; border:1px solid var(--rule);
+    border-radius:3px; color:var(--sumi-mid); font:500 12px var(--gothic); letter-spacing:.08em;
+  }
+  .wide.hot{border-color:var(--shu); color:var(--shu)}
+  nav{display:flex; border-top:1px solid var(--rule); flex-shrink:0}
+  nav button{
+    flex:1; padding:13px 0 15px; background:none; border:none;
+    border-top:2px solid transparent; color:var(--sumi-dim);
+    font:500 12px var(--gothic); letter-spacing:.1em;
+  }
+  nav button.on{border-top-color:var(--sumi); color:var(--sumi)}
+  .pad{padding:22px 18px 30px}
+  .hint{font:400 12px/1.8 var(--gothic); color:var(--sumi-dim)}
+  .warn{font:400 12px/1.6 var(--gothic); color:var(--shu)}
+
+  /* home */
+  .figures{display:flex; gap:26px; align-items:flex-end}
+  .big{font:500 44px/1 var(--mincho); color:var(--shu)}
+  .mid{font:500 26px/1 var(--mincho); color:var(--sumi-mid)}
+  .cap{font:400 10px var(--mono); color:var(--sumi-dim); letter-spacing:.16em; margin-top:6px}
+  .pips{display:flex; gap:5px; justify-content:flex-end}
+  .pip{width:9px; height:9px; border-radius:999px; border:1px solid var(--rule)}
+  .pip.on{background:var(--shu); border-color:var(--shu)}
+  .cal{margin-top:26px}
+  .week{display:flex; gap:6px; margin-bottom:6px}
+  .day{
+    flex:1; aspect-ratio:1; border-radius:999px; border:1px solid var(--rule);
+    display:flex; align-items:center; justify-content:center;
+    font:400 10px var(--mono); color:var(--sumi-dim);
+  }
+  .day.part{border-color:var(--shu); color:var(--shu)}
+  .day.full{background:var(--shu); border-color:var(--shu); color:var(--paper)}
+  .day.today{outline:1px solid var(--sumi); outline-offset:2px}
+  .day.future{border-color:transparent; opacity:.25}
+
+  /* reader */
+  article{padding:20px 20px 40px}
+  .eyebrow{display:flex; align-items:center; gap:8px; font:400 10px var(--mono);
+    color:var(--sumi-dim); letter-spacing:.14em}
+  .eyebrow .dash{width:14px; height:1px; background:var(--rule)}
+  .eyebrow .topic{font-family:var(--gothic); letter-spacing:.08em; flex:1; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  h1{font:500 22px var(--mincho); letter-spacing:.08em; margin:16px 0 20px}
+  .body{font:400 19px/2.15 var(--mincho); letter-spacing:.02em; margin:0}
+  .body span{cursor:pointer}
+  .term.lit{color:var(--ai)}
+  .ch.lit{color:var(--ai); background:rgba(47,75,124,.10)}
+  .mark1{-webkit-text-emphasis:filled dot var(--shu); text-emphasis:filled dot var(--shu)}
+  .mark2{-webkit-text-emphasis:open dot var(--shu); text-emphasis:open dot var(--shu)}
+  .expr{margin-top:30px; padding-top:16px; border-top:1px solid var(--rule)}
+  .expr .lbl{font:500 10px var(--mono); color:var(--sumi-dim); letter-spacing:.18em; margin-bottom:10px}
+  .expr .row{display:flex; gap:12px; margin-bottom:7px; align-items:baseline}
+  .expr .jp{font:500 14px var(--mincho); color:var(--ai); flex-shrink:0}
+  .expr .en{font:400 12px/1.5 var(--gothic); color:var(--sumi-mid)}
+  .next{margin-top:34px; width:100%; padding:15px; background:none;
+    border:1px solid var(--sumi-dim); border-radius:3px; color:var(--sumi);
+    font:500 13px var(--gothic); letter-spacing:.1em}
+
+  /* gloss sheet */
+  .gloss{position:sticky; bottom:0; background:var(--sumi); color:var(--paper);
+    padding:16px 20px 18px; cursor:pointer; flex-shrink:0}
+  .gloss .head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+  .gloss .t{font:500 21px var(--mincho)}
+  .gloss .r{font:400 13px var(--gothic); color:#B9B5A6}
+  .gloss .tag{font:400 9px var(--mono); color:#B9B5A6; border:1px solid #6A6B60;
+    border-radius:2px; padding:1px 5px; letter-spacing:.1em}
+  .gloss .m{font:400 14px/1.6 var(--gothic); color:#DEDACB; margin-top:7px}
+  .gloss .widen{margin-left:auto; display:flex; gap:6px}
+  .gloss .widen button{background:none; border:1px solid #6A6B60; border-radius:2px;
+    color:#DEDACB; font:400 10px var(--gothic); padding:3px 7px}
+
+  .flash{background:var(--shu); color:var(--paper); padding:12px 20px;
+    font:500 13px var(--gothic); letter-spacing:.1em; text-align:center; flex-shrink:0}
+
+  /* words */
+  .grp{padding:16px 18px 8px; display:flex; align-items:center; gap:9px}
+  .grp b{font:500 11px var(--gothic); letter-spacing:.14em}
+  .grp span{font:400 10px var(--mono); color:var(--sumi-dim)}
+  .word{padding:11px 18px; border-top:1px solid var(--rule); display:flex;
+    align-items:baseline; gap:12px}
+  .word .jp{font:500 17px var(--mincho)}
+  .word .kana{font:400 11px var(--gothic); color:var(--sumi-dim); margin-left:9px}
+  .word .en{font:400 12px/1.5 var(--gothic); color:var(--sumi-mid); margin-top:3px}
+
+  /* settings */
+  label{display:block; font:500 10px var(--mono); color:var(--sumi-dim);
+    letter-spacing:.16em; margin:18px 0 6px}
+  input{width:100%; padding:11px 12px; background:var(--paper-deep);
+    border:1px solid var(--rule); border-radius:3px; color:var(--sumi);
+    font:400 13px var(--mono)}
+  .row2{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">読</span>
+  <span class="meta" id="hdr"></span>
+  <span class="spacer"></span>
+  <span id="hdrbtns" style="display:flex;gap:6px"></span>
+</header>
+
+<main id="main"></main>
+<div id="sheet"></div>
+<div id="flash"></div>
+
+<nav>
+  <button data-v="home" class="on">記録</button>
+  <button data-v="read">本文</button>
+  <button data-v="words">語帳</button>
+  <button data-v="set">設定</button>
+</nav>
+
+<script>
+/* =====================================================================
+   読 — reading-first Japanese.
+   One file. State lives in localStorage; if a sync endpoint is set,
+   it is merged with the server copy so phone and laptop agree.
+   ===================================================================== */
+
+const BLOCK = 4;          // passages in a block — and a full day
+const DWELL = 9000;       // ms a passage must be on screen to count
+const DAY = 86400000;
+
+const DOMAINS = {
+  eta:  "事業承継・M&A",
+  vc:   "スタートアップ投資",
+  econ: "経済・時事",
+  mgmt: "経営・組織",
+};
+
+/* ------------------------------ seed ------------------------------ */
+
+const SEED = {
+  topic: "後継者不在と第三者承継",
+  domain: "eta",
+  passages: [
+    { id:"s1", title:"後継者難",
+      text:"中小企業の経営者の高齢化が進んでいる。六十代以上の経営者のうち、後継者が決まっていない企業は依然として多い。かつては子が家業を継ぐのが一般的だったが、都市部で就職した子世代が戻る例は減っている。引退の時期を迎えても引き継ぐ相手がいなければ、選択肢は廃業に絞られる。業績が黒字であっても事業をたたむ企業が相次いでいるのは、この構造による。",
+      terms:[
+        {t:"高齢化",r:"こうれいか",m:"ageing (of a population)",k:"w"},
+        {t:"依然として",r:"いぜんとして",m:"still; as before",k:"e"},
+        {t:"家業",r:"かぎょう",m:"the family business",k:"w"},
+        {t:"引き継ぐ",r:"ひきつぐ",m:"to take over",k:"w"},
+        {t:"廃業",r:"はいぎょう",m:"closing down a business",k:"w"},
+        {t:"絞られる",r:"しぼられる",m:"to be narrowed down",k:"w"},
+        {t:"たたむ",r:"",m:"to wind up (a business)",k:"w"},
+        {t:"相次いで",r:"あいついで",m:"one after another",k:"w"}]},
+    { id:"s2", title:"譲渡への抵抗",
+      text:"会社を第三者に売ることへの心理的な抵抗は、なお根強い。経営者の世代には、身売りという言葉が使われた時代の記憶が残っている。従業員に対する責任感も、決断を重くする要因である。ただし近年は受け止め方が変わりつつある。廃業すれば雇用も取引関係も失われるが、譲渡であれば事業はそのまま続く。判断を先送りするほど設備は古くなり、人材は流出し、企業の価値は下がっていく。",
+      terms:[
+        {t:"抵抗",r:"ていこう",m:"resistance; reluctance",k:"w"},
+        {t:"根強い",r:"ねづよい",m:"deep-rooted",k:"w"},
+        {t:"身売り",r:"みうり",m:"selling oneself off (pejorative)",k:"w"},
+        {t:"要因",r:"よういん",m:"factor; contributing cause",k:"w"},
+        {t:"つつある",r:"",m:"is gradually coming to ~",k:"e"},
+        {t:"雇用",r:"こよう",m:"employment",k:"w"},
+        {t:"譲渡",r:"じょうと",m:"transfer; sale (of a business)",k:"w"},
+        {t:"先送り",r:"さきおくり",m:"putting off; deferring",k:"w"},
+        {t:"流出",r:"りゅうしゅつ",m:"outflow; drain",k:"w"}]},
+    { id:"s3", title:"探すという仕事",
+      text:"サーチファンドは、経営者になろうとする個人が投資家から資金を集め、自ら買収先を探す仕組みである。米国の経営大学院を中心に広がり、日本でも十年ほど前から事例が出始めた。探索の期間は二年程度が目安となる。候補企業に手紙を送り、面談を重ねても、実際に交渉に至るのは全体のごく一部にすぎない。それでも、一から起業する場合と比べれば、経営権を得るまでの道筋は具体的である。",
+      terms:[
+        {t:"買収先",r:"ばいしゅうさき",m:"acquisition target",k:"w"},
+        {t:"仕組み",r:"しくみ",m:"mechanism; structure",k:"w"},
+        {t:"事例",r:"じれい",m:"case; instance",k:"w"},
+        {t:"探索",r:"たんさく",m:"search",k:"w"},
+        {t:"目安",r:"めやす",m:"rough standard; yardstick",k:"w"},
+        {t:"面談",r:"めんだん",m:"meeting; interview",k:"w"},
+        {t:"至る",r:"いたる",m:"to reach; arrive at",k:"w"},
+        {t:"にすぎない",r:"",m:"is no more than ~",k:"e"},
+        {t:"経営権",r:"けいえいけん",m:"management control",k:"w"},
+        {t:"道筋",r:"みちすじ",m:"path; route to something",k:"w"}]},
+    { id:"s4", title:"買収前の調査",
+      text:"買収前の調査では、財務諸表だけを見ていても実態はつかめない。帳簿に計上されたままの不良在庫や、社長個人が立て替えてきた費用が見つかることは珍しくない。従業員への聞き取りから、特定の担当者に業務が集中している状況が明らかになる場合もある。こうした事実が判明しても、取引を中止する理由になるとは限らない。むしろ、承継後にどこから着手すべきかを判断する材料になる。",
+      terms:[
+        {t:"財務諸表",r:"ざいむしょひょう",m:"financial statements",k:"w"},
+        {t:"実態",r:"じったい",m:"the actual state of things",k:"w"},
+        {t:"帳簿",r:"ちょうぼ",m:"the books; ledger",k:"w"},
+        {t:"計上",r:"けいじょう",m:"recording (on the books)",k:"w"},
+        {t:"不良在庫",r:"ふりょうざいこ",m:"dead stock",k:"w"},
+        {t:"立て替えて",r:"たてかえて",m:"paying on another's behalf",k:"w"},
+        {t:"聞き取り",r:"ききとり",m:"interviews; hearings",k:"w"},
+        {t:"判明",r:"はんめい",m:"coming to light",k:"w"},
+        {t:"とは限らない",r:"とはかぎらない",m:"is not necessarily ~",k:"e"},
+        {t:"着手",r:"ちゃくしゅ",m:"setting to work on",k:"w"}]},
+  ],
+};
+
+/* ------------------------------ state ------------------------------ */
+
+const blank = () => ({
+  known: {},          // term -> {r,m,k,strength,enc,due}
+  days: {},           // "YYYY-MM-DD" -> [passage ids actually read]
+  level: 3,
+  seenTopics: [],
+  domain: "eta",
+  block: SEED,
+  idx: 0,
+  blockAt: 0,
+  updated: 0,
+});
+
+let S = blank();
+let cfg = { url: "", token: "" };
+let view = "home";
+let gloss = null, marks = false, pending = null, busy = false, step = 0;
+let note = null, flashMsg = null, tappedNow = {}, enter = Date.now(), syncedAt = null;
+
+const LS = "yomi-v2", LSC = "yomi-cfg";
+
+function loadLocal() {
+  try { const r = localStorage.getItem(LS); if (r) S = { ...blank(), ...JSON.parse(r) }; } catch (e) {}
+  try { const r = localStorage.getItem(LSC); if (r) cfg = { ...cfg, ...JSON.parse(r) }; } catch (e) {}
+}
+function saveLocal() {
+  S.updated = Date.now();
+  try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {}
+}
+function saveCfg() {
+  try { localStorage.setItem(LSC, JSON.stringify(cfg)); } catch (e) {}
+}
+
+/* ------------------------------ dates ------------------------------ */
+
+const dayKey = (d = new Date()) => {
+  const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return z.toISOString().slice(0, 10);
+};
+const shiftKey = (k, n) => {
+  const d = new Date(k + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return dayKey(d);
+};
+
+/* A day counts only when the whole block was read. No freezes, no credit
+   for days you didn't read — the number means exactly what it says. */
+const readCount = (k) => (S.days[k] || []).length;
+const complete = (k) => readCount(k) >= BLOCK;
+
+function currentStreak() {
+  const today = dayKey();
+  let k = complete(today) ? today : shiftKey(today, -1);
+  if (!complete(k)) return 0;
+  let n = 0;
+  while (complete(k)) { n++; k = shiftKey(k, -1); }
+  return n;
+}
+
+function longestStreak() {
+  const done = Object.keys(S.days).filter(complete).sort();
+  let best = 0, run = 0, prev = null;
+  for (const k of done) {
+    run = prev && shiftKey(prev, 1) === k ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = k;
+  }
+  return best;
+}
+
+/* ------------------------------ merge ------------------------------
+   Passage ids, not counts. Union is order-independent, so it does not
+   matter which device syncs first or how stale one of them is.
+------------------------------------------------------------------- */
+
+function mergeState(a, b) {
+  const out = { ...(a.updated > b.updated ? a : b) };
+
+  out.days = { ...(a.days || {}) };
+  for (const [k, ids] of Object.entries(b.days || {})) {
+    out.days[k] = [...new Set([...(out.days[k] || []), ...ids])];
+  }
+
+  out.known = { ...(a.known || {}) };
+  for (const [t, v] of Object.entries(b.known || {})) {
+    const cur = out.known[t];
+    if (!cur || (v.enc || 0) > (cur.enc || 0)) out.known[t] = v;
+  }
+
+  out.seenTopics = [...new Set([...(a.seenTopics || []), ...(b.seenTopics || [])])];
+
+  const newer = (a.blockAt || 0) >= (b.blockAt || 0) ? a : b;
+  out.block = newer.block || SEED;
+  out.idx = newer.idx || 0;
+  out.blockAt = newer.blockAt || 0;
+  out.level = (a.updated > b.updated ? a : b).level ?? 3;
+  return out;
+}
+
+/* ------------------------------ network ------------------------------ */
+
+const configured = () => !!(cfg.url && cfg.token);
+const base = () => cfg.url.replace(/\/+$/, "");
+
+async function pull() {
+  if (!configured()) return;
+  try {
+    const r = await fetch(base() + "/sync", { headers: { "X-Yomi-Token": cfg.token } });
+    if (!r.ok) throw new Error("sync");
+    const remote = JSON.parse(await r.json());
+    if (remote) { S = mergeState(remote, S); saveLocal(); }
+    syncedAt = Date.now();
+  } catch (e) { /* offline is fine; local keeps working */ }
+}
+
+async function push() {
+  saveLocal();
+  if (!configured()) return;
+  try {
+    const r = await fetch(base() + "/sync", { headers: { "X-Yomi-Token": cfg.token } });
+    if (r.ok) {
+      const remote = JSON.parse(await r.json());
+      if (remote) S = mergeState(remote, S);
+    }
+    await fetch(base() + "/sync", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-Yomi-Token": cfg.token },
+      body: JSON.stringify(S),
+    });
+    syncedAt = Date.now();
+    saveLocal();
+  } catch (e) { /* try again next time */ }
+}
+
+async function callAPI(prompt, retry = true) {
+  if (!configured()) throw new Error("unconfigured");
+  let res;
+  try {
+    res = await fetch(base() + "/api", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Yomi-Token": cfg.token },
+      body: JSON.stringify({
+        model: "claude-sonnet-5",
+        max_tokens: 1200,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+  } catch (e) { throw new Error("offline"); }
+  if (!res.ok) throw new Error(res.status === 401 ? "token" : "offline");
+
+  const data = await res.json();
+  const text = (data.content || []).filter(c => c.type === "text").map(c => c.text).join("");
+  try {
+    let t = text.replace(/```json|```/g, "").trim();
+    const a = t.indexOf("{"), b = t.lastIndexOf("}");
+    if (a >= 0 && b > a) t = t.slice(a, b + 1);
+    return JSON.parse(t);
+  } catch (e) {
+    if (retry) return callAPI(prompt + "\n\nKeep it tight. Shorter passage, fewer terms.", false);
+    throw new Error("garbled");
+  }
+}
+
+/* ------------------------------ generation ------------------------------ */
+
+const VOICE = `You are writing Japanese reading material for a bilingual Japanese-American adult. He speaks Japanese fluently and is building his written and formal register.
+
+Write the way a good 日経 article or a serious essay reads. That means PLAIN, INFORMATIONAL PROSE: ordinary 漢語 vocabulary carrying a clear argument, sentences that each advance a point. It does NOT mean decorative language.
+
+Critical constraint — idiom density. Set expressions, 慣用句 and literary turns of phrase (口をそろえて、後を絶たない、裏目に出る、往々にして and the like) appear RARELY in real newspaper prose: perhaps once in several paragraphs. Use AT MOST ONE in the whole passage, and only where it is genuinely the natural choice. A passage with three of them does not read as sophisticated Japanese; it reads as artificial and is harder to follow.
+
+Write the passage first as good prose. Then extract the glossable terms from what you wrote. Never construct sentences in order to accommodate a vocabulary list — that is what produces unnatural text.`;
+
+const spec = (recycle) =>
+  `The passage: 140–180 Japanese characters, plus a 2–6 character title, plus 6–8 glossable terms drawn from it.
+Difficulty ${S.level} of 5 — roughly ${Math.max(2, 8 - S.level)} terms a fluent-but-not-literary reader would pause on. Difficulty comes from precise vocabulary and dense argument, NOT from piling on idioms.
+Terms must appear in the text in EXACTLY the listed form (match the conjugation as written). Mark k as "e" for a set expression or grammar pattern, "w" for an ordinary word. Most terms must be "w"; at most one may be "e".${
+    recycle.length
+      ? `\nIf any of these fit the topic naturally, work them in — but only where they belong. Skip any that would be forced: ${recycle.join("、")}. List whichever you used in terms.`
+      : ""
+  }`;
+
+function dueTerms() {
+  return Object.entries(S.known)
+    .filter(([, v]) => (v.due || 0) <= Date.now() && (v.strength || 0) < 4)
+    .sort((a, b) => (a[1].strength || 0) - (b[1].strength || 0))
+    .slice(0, 8)
+    .map(([t]) => t);
+}
+
+const rotate = () => {
+  const keys = Object.keys(DOMAINS);
+  return keys[(keys.indexOf(S.domain) + 1) % keys.length];
+};
+
+async function fetchBlock(dm, onStep) {
+  const recycle = dueTerms();
+  const avoid = S.seenTopics.slice(-8).join("、") || "なし";
+  const passages = [];
+  let topic = null;
+
+  for (let i = 0; i < BLOCK; i++) {
+    onStep(i);
+    const mine = recycle.slice(i * 2, i * 2 + 2);
+    const prompt = i === 0
+      ? `${VOICE}\n\nPick ONE specific topic inside the domain 「${DOMAINS[dm]}」 — narrow enough that ${BLOCK} passages can circle it from different angles and reuse the same vocabulary. Avoid these recent topics: ${avoid}\n\nWrite the FIRST passage. ${spec(mine)}\n\nRespond with ONLY JSON, no fences:\n{"topic":"","passage":{"title":"","text":"","terms":[{"t":"","r":"","m":"","k":"w"}]}}`
+      : `${VOICE}\n\nTopic: 「${topic}」（domain: ${DOMAINS[dm]}）\nAlready written: ${passages.map(p => p.title).join("、")}\n\nWrite passage ${i + 1} of ${BLOCK} — a different angle on the same topic, so core vocabulary recurs naturally but content does not repeat. ${spec(mine)}\n\nRespond with ONLY JSON, no fences:\n{"passage":{"title":"","text":"","terms":[{"t":"","r":"","m":"","k":"w"}]}}`;
+
+    let out;
+    try { out = await callAPI(prompt); }
+    catch (err) { if (passages.length) break; throw err; }
+
+    if (i === 0) topic = out.topic;
+    const p = out.passage;
+    if (p && p.text && Array.isArray(p.terms)) {
+      passages.push({
+        id: "g" + Date.now() + i,
+        title: p.title || "無題",
+        text: p.text,
+        terms: p.terms.filter(tm => tm.t && p.text.includes(tm.t)),
+      });
+    }
+  }
+  if (!passages.length) throw new Error("garbled");
+  return { topic: topic || DOMAINS[dm], domain: dm, passages };
+}
+
+function install(b) {
+  S.block = b;
+  S.idx = 0;
+  S.domain = b.domain;
+  S.blockAt = Date.now();
+  if (!S.seenTopics.includes(b.topic)) S.seenTopics.push(b.topic);
+  tappedNow = {}; gloss = null; marks = false; enter = Date.now();
+  push();
+}
+
+const failNote = (e) => ({
+  unconfigured: "設定でサーバーを登録してください。",
+  token: "トークンが違います。設定を確認してください。",
+  garbled: "応答が不正でした。もう一度。",
+  offline: "接続できませんでした。画面を消さずにもう一度お試しください。",
+}[e.message] || "読み込めませんでした。");
+
+async function newBlock() {
+  if (busy) return;
+  busy = true; note = null; render();
+  try {
+    if (pending) { const b = pending; pending = null; install(b); flash("新しい主題　" + b.topic); }
+    else {
+      const b = await fetchBlock(rotate(), i => { step = i; render(); });
+      install(b); flash("新しい主題　" + b.topic);
+    }
+    view = "read";
+  } catch (e) { note = failNote(e); }
+  step = 0; busy = false; render();
+}
+
+async function prefetch() {
+  if (busy || pending || !configured()) return;
+  if (S.idx < S.block.passages.length - 1) return;
+  try { pending = await fetchBlock(rotate(), () => {}); render(); } catch (e) {}
+}
+
+/* ------------------------------ reading ------------------------------ */
+
+const passage = () => S.block.passages[S.idx];
+const finished = () => S.idx >= S.block.passages.length;
+
+function segment(text, terms) {
+  const hits = [];
+  terms.forEach(tm => {
+    let i = text.indexOf(tm.t);
+    while (i !== -1) { hits.push({ start: i, end: i + tm.t.length, term: tm }); i = text.indexOf(tm.t, i + 1); }
+  });
+  hits.sort((a, b) => a.start - b.start || b.end - a.end);
+  const kept = []; let cur = -1;
+  hits.forEach(h => { if (h.start >= cur) { kept.push(h); cur = h.end; } });
+  const out = []; let p = 0;
+  kept.forEach(h => { if (h.start > p) out.push({ plain: text.slice(p, h.start), at: p }); out.push(h); p = h.end; });
+  if (p < text.length) out.push({ plain: text.slice(p), at: p });
+  return out;
+}
+
+const classOf = (ch) => {
+  const c = ch.codePointAt(0);
+  if (c >= 0x4e00 && c <= 0x9fff) return "kanji";
+  if (c >= 0x30a0 && c <= 0x30ff) return "kata";
+  if (c >= 0x3040 && c <= 0x309f) return "hira";
+  if (/[A-Za-z0-9]/.test(ch)) return "latin";
+  return "other";
+};
+
+function autoSpan(text, i) {
+  const k = classOf(text[i]);
+  if (k === "other") return { start: i, end: i + 1 };
+  let s = i, e = i + 1;
+  while (s > 0 && classOf(text[s - 1]) === k) s--;
+  while (e < text.length && classOf(text[e]) === k) e++;
+  if (k === "kanji") {
+    let j = e;
+    while (j < text.length && j < e + 2 && classOf(text[j]) === "hira") j++;
+    if (j > e && !"はがをにでともへや、。".includes(text[e])) e = j;
+  }
+  return { start: s, end: e };
+}
+
+function recordTap(term) {
+  tappedNow[term.t] = true;
+  const prev = S.known[term.t];
+  S.known[term.t] = {
+    r: term.r, m: term.m, k: term.k,
+    strength: prev ? Math.max(0, prev.strength - 1) : 0,
+    enc: (prev?.enc || 0) + 1,
+    due: Date.now() + 2 * DAY,
+  };
+  push();
+}
+
+async function lookup(start, end) {
+  const text = passage().text;
+  const span = text.slice(start, end);
+  gloss = { t: span, m: "", adhoc: true, at: { start, end }, pending: true };
+  render();
+  try {
+    const out = await callAPI(`Japanese sentence:\n${text}\n\nA reader tapped 「${span}」 in it. Identify the word or set expression it belongs to — it may be longer or shorter than what was tapped.\n\nReturn:\nt = the exact substring of the sentence above forming that word/expression (must appear verbatim)\nr = kana reading of t (empty string if already kana)\nm = short English meaning as used HERE, under 8 words\nk = "e" for a set expression or grammar pattern, "w" for an ordinary word\n\nRespond with ONLY JSON, no fences:\n{"t":"","r":"","m":"","k":"w"}`);
+    if (!out || !out.t || !text.includes(out.t)) throw new Error("garbled");
+    const term = { t: out.t, r: out.r || "", m: out.m || "", k: out.k === "e" ? "e" : "w" };
+    const at = text.indexOf(out.t);
+    gloss = { ...term, adhoc: true, at: { start: at, end: at + out.t.length } };
+    const p = passage();
+    if (!p.terms.some(x => x.t === term.t)) p.terms.push(term);
+    recordTap(term);
+  } catch (e) {
+    gloss = { t: span, adhoc: true, at: { start, end },
+      error: e.message === "unconfigured" ? "設定が必要です" : e.message === "offline" ? "接続が必要です" : "引けませんでした" };
+  }
+  render();
+}
+
+function widen(side) {
+  if (!gloss || !gloss.at) return;
+  const { start, end } = gloss.at;
+  lookup(side === "l" ? Math.max(0, start - 1) : start,
+         side === "r" ? Math.min(passage().text.length, end + 1) : end);
+}
+
+function advance() {
+  const dwell = Date.now() - enter;
+  const p = passage();
+
+  /* Credit the passage only if it was actually on screen long enough. */
+  if (dwell >= DWELL) {
+    const k = dayKey();
+    const ids = S.days[k] || [];
+    const wasDone = ids.length >= BLOCK;
+    if (!ids.includes(p.id)) S.days[k] = [...ids, p.id];
+
+    p.terms.forEach(tm => {
+      if (tappedNow[tm.t]) return;
+      const prev = S.known[tm.t];
+      if (!prev) return;
+      const strength = Math.min(4, prev.strength + 1);
+      S.known[tm.t] = { ...prev, strength, enc: prev.enc + 1,
+        due: Date.now() + Math.pow(2.4, strength) * DAY };
+    });
+
+    if (!wasDone && (S.days[k] || []).length >= BLOCK) {
+      const n = currentStreak();
+      flash(`本日達成　連続${n}日`);
+    }
+  }
+
+  const taps = Object.keys(tappedNow).length;
+  if (taps >= 7) S.level = Math.max(1, S.level - 1);
+  else if (taps <= 1 && dwell >= DWELL) S.level = Math.min(5, S.level + 1);
+
+  S.idx += 1;
+  tappedNow = {}; gloss = null; marks = false; enter = Date.now();
+  push();
+
+  if (finished() && pending) { const b = pending; pending = null; install(b); flash("新しい主題　" + b.topic); }
+  else prefetch();
+
+  document.getElementById("main").scrollTop = 0;
+  render();
+}
+
+/* ------------------------------ render ------------------------------ */
+
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+function flash(msg) {
+  flashMsg = msg; render();
+  setTimeout(() => { flashMsg = null; render(); }, 3400);
+}
+
+function homeView() {
+  const streak = currentStreak(), best = Math.max(longestStreak(), streak);
+  const todayN = readCount(dayKey());
+  const pips = Array.from({ length: BLOCK },
+    (_, i) => `<span class="pip${i < todayN ? " on" : ""}"></span>`).join("");
+
+  const today = new Date(), start = new Date(today);
+  start.setDate(start.getDate() - today.getDay() - 28);
+  let cal = "";
+  for (let w = 0; w < 5; w++) {
+    cal += '<div class="week">';
+    for (let d = 0; d < 7; d++) {
+      const cur = new Date(start); cur.setDate(start.getDate() + w * 7 + d);
+      const k = dayKey(cur), n = readCount(k);
+      const cls = ["day"];
+      if (n >= BLOCK) cls.push("full"); else if (n > 0) cls.push("part");
+      if (k === dayKey()) cls.push("today");
+      if (k > dayKey()) cls.push("future");
+      cal += `<div class="${cls.join(" ")}">${n > 0 ? cur.getDate() : ""}</div>`;
+    }
+    cal += "</div>";
+  }
+
+  const label = busy ? `読み込み中 ${step + 1}／${BLOCK}`
+    : finished() ? "新しい主題を読み込む"
+    : todayN > 0 ? "続きを読む" : "今日の分を読む";
+
+  return `<div class="pad">
+    <div class="figures">
+      <div><div class="big">${streak}</div><div class="cap">連続</div></div>
+      <div><div class="mid">${best}</div><div class="cap">最長</div></div>
+      <div class="spacer" style="text-align:right">
+        <div class="pips">${pips}</div>
+        <div style="font:400 11px var(--gothic);color:${todayN >= BLOCK ? "var(--shu)" : "var(--sumi-dim)"};margin-top:7px">
+          ${todayN >= BLOCK ? "本日達成" : `あと${BLOCK - todayN}本`}
+        </div>
+      </div>
+    </div>
+
+    <button class="solid" id="go" style="margin-top:24px" ${busy ? "disabled" : ""}>${label}</button>
+    <div style="font:400 11px var(--gothic);color:var(--sumi-dim);text-align:center;margin-top:8px">
+      ${esc(S.block.topic)}${finished() ? "" : `　${S.idx + 1}／${S.block.passages.length}`}
+    </div>
+    ${note ? `<div class="warn" style="margin-top:10px;text-align:center">${esc(note)}</div>` : ""}
+    ${!configured() ? `<div class="hint" style="margin-top:14px;text-align:center">設定でサーバーを登録すると、新しい本文と端末間の同期が使えます。</div>` : ""}
+
+    <div class="cal">${cal}</div>
+    <div class="hint" style="margin-top:16px">一日${BLOCK}本を読み切ると記録されます。</div>
+  </div>`;
+}
+
+function readView() {
+  if (finished()) {
+    return `<div class="pad" style="text-align:center;padding-top:56px">
+      <div style="font:400 20px var(--mincho);letter-spacing:.12em">読み終えました</div>
+      <div style="font:400 13px/1.9 var(--gothic);color:var(--sumi-mid);margin-top:14px">
+        「${esc(S.block.topic)}」を${S.block.passages.length}本。
+      </div>
+      <button class="solid" id="go" style="margin-top:26px" ${busy ? "disabled" : ""}>
+        ${busy ? `読み込み中 ${step + 1}／${BLOCK}` : pending ? "次の主題へ（用意済み）" : "次の主題を読み込む"}
+      </button>
+      ${note ? `<div class="warn" style="margin-top:12px">${esc(note)}</div>` : ""}
+    </div>`;
+  }
+
+  const p = passage();
+  let body = "";
+  segment(p.text, p.terms).forEach((seg, i) => {
+    if (seg.plain !== undefined) {
+      seg.plain.split("").forEach((ch, j) => {
+        const abs = seg.at + j;
+        const lit = gloss && gloss.adhoc && gloss.at && abs >= gloss.at.start && abs < gloss.at.end;
+        body += `<span class="ch${lit ? " lit" : ""}" data-at="${abs}">${esc(ch)}</span>`;
+      });
+      return;
+    }
+    const rec = S.known[seg.term.t];
+    const tapped = tappedNow[seg.term.t];
+    let cls = "term";
+    if (tapped) cls += " lit mark1";
+    else if (marks && rec) cls += rec.strength <= 1 ? " mark1" : rec.strength === 2 ? " mark2" : "";
+    body += `<span class="${cls}" data-term="${esc(seg.term.t)}">${esc(seg.term.t)}</span>`;
+  });
+
+  const ex = p.terms.filter(t => t.k === "e").slice(0, 2);
+  const exHtml = ex.length ? `<div class="expr"><div class="lbl">表現</div>${
+    ex.map(e => `<div class="row"><span class="jp">${esc(e.t)}</span><span class="en">${esc(e.m)}</span></div>`).join("")
+  }</div>` : "";
+
+  const todayN = readCount(dayKey());
+  const pips = Array.from({ length: BLOCK },
+    (_, i) => `<span class="pip${i < todayN ? " on" : ""}"></span>`).join("");
+
+  return `<article>
+    <div class="eyebrow">
+      <span>${String(S.idx + 1).padStart(2, "0")}／${String(S.block.passages.length).padStart(2, "0")}</span>
+      <span class="dash"></span>
+      <span class="topic">${esc(S.block.topic)}</span>
+      <span class="pips">${pips}</span>
+    </div>
+    <h1>${esc(p.title)}</h1>
+    <p class="body">${body}</p>
+    ${exHtml}
+    <button class="next" id="next">${S.idx + 1 === S.block.passages.length ? "読み終える" : "次へ"}</button>
+  </article>`;
+}
+
+function wordsView() {
+  const entries = Object.entries(S.known);
+  if (!entries.length) return `<div class="pad" style="text-align:center;padding-top:56px">
+    <div class="hint">まだ何も引いていません。<br>本文で分からない語に触れると、ここに溜まります。</div></div>`;
+
+  const groups = [["まだ", 0, 1], ["あと少し", 2, 2], ["定着", 3, 9]];
+  return groups.map(([label, lo, hi]) => {
+    const rows = entries.filter(([, v]) => v.strength >= lo && v.strength <= hi);
+    if (!rows.length) return "";
+    return `<section><div class="grp"><b>${label}</b><span>${rows.length}</span></div>${
+      rows.map(([t, v]) => `<div class="word"><div style="flex:1;min-width:0">
+        <div><span class="jp ${v.strength <= 1 ? "mark1" : v.strength === 2 ? "mark2" : ""}">${esc(t)}</span>${
+          v.r ? `<span class="kana">${esc(v.r)}</span>` : ""}</div>
+        <div class="en">${esc(v.m || "")}</div></div>
+        <span style="font:400 9px var(--mono);color:var(--sumi-dim)">${v.k === "e" ? "表現" : ""}</span>
+      </div>`).join("")
+    }</section>`;
+  }).join("");
+}
+
+function setView() {
+  const tracked = Object.keys(S.known).length;
+  const settled = Object.values(S.known).filter(v => v.strength >= 3).length;
+  return `<div class="pad">
+    <div class="hint">サーバーを登録すると、新しい本文の生成と、端末間の同期が有効になります。README の手順で五分ほどです。</div>
+    <label>SERVER URL</label>
+    <input id="url" value="${esc(cfg.url)}" placeholder="https://yomi.you.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <label>TOKEN</label>
+    <input id="token" value="${esc(cfg.token)}" type="password" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="row2">
+      <button class="ghost" id="save">保存して接続を確認</button>
+      <button class="ghost" id="sync">今すぐ同期</button>
+    </div>
+    <div id="setmsg" class="hint" style="margin-top:10px">${
+      syncedAt ? "同期 " + new Date(syncedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) :
+      configured() ? "未同期" : "未設定 — 本文は同梱分のみ"}</div>
+
+    <div style="margin-top:26px;padding-top:16px;border-top:1px solid var(--rule)" class="hint">
+      語彙 ${settled}／${tracked} 定着 · 難度 ${S.level}／5
+    </div>
+    <div class="row2">
+      <button class="ghost" id="resetblock">本文を初期化</button>
+      <button class="ghost" id="resetall">全消去</button>
+    </div>
+  </div>`;
+}
+
+function render() {
+  const streak = currentStreak();
+  document.getElementById("hdr").innerHTML =
+    `<span style="color:${streak ? "var(--shu)" : "var(--sumi-dim)"}">連続 ${streak}日</span>`;
+
+  document.getElementById("hdrbtns").innerHTML =
+    view === "read" && !finished()
+      ? `<button class="ghost${marks ? " on" : ""}" id="marks">印</button>
+         <button class="ghost${pending ? " hot" : ""}" id="refresh" ${busy ? "disabled" : ""}>${busy ? `${step + 1}／${BLOCK}` : "更新"}</button>`
+      : "";
+
+  document.getElementById("main").innerHTML =
+    view === "home" ? homeView() :
+    view === "read" ? readView() :
+    view === "words" ? wordsView() : setView();
+
+  document.getElementById("sheet").innerHTML =
+    gloss && view === "read" ? `<div class="gloss" id="gloss">
+      <div class="head">
+        <span class="t">${esc(gloss.t)}</span>
+        ${gloss.r ? `<span class="r">${esc(gloss.r)}</span>` : ""}
+        ${gloss.k === "e" ? `<span class="tag">表現</span>` : ""}
+        ${gloss.adhoc && !gloss.pending ? `<span class="widen">
+          <button data-w="l">←広</button><button data-w="r">広→</button></span>` : ""}
+      </div>
+      <div class="m">${gloss.pending ? "調べています…" : esc(gloss.error || gloss.m || "")}</div>
+    </div>` : "";
+
+  document.getElementById("flash").innerHTML =
+    flashMsg ? `<div class="flash">${esc(flashMsg)}</div>` : "";
+
+  document.querySelectorAll("nav button").forEach(b =>
+    b.classList.toggle("on", b.dataset.v === view));
+
+  bind();
+}
+
+/* ------------------------------ events ------------------------------ */
+
+function bind() {
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+
+  on("go", () => { if (finished()) newBlock(); else { view = "read"; enter = Date.now(); render(); } });
+  on("next", advance);
+  on("refresh", newBlock);
+  on("marks", () => { marks = !marks; render(); });
+  on("gloss", () => { gloss = null; render(); });
+
+  document.querySelectorAll(".gloss .widen button").forEach(b =>
+    b.onclick = ev => { ev.stopPropagation(); widen(b.dataset.w); });
+
+  document.querySelectorAll(".body .term").forEach(el =>
+    el.onclick = () => {
+      const t = passage().terms.find(x => x.t === el.dataset.term);
+      if (t) { gloss = t; recordTap(t); render(); }
+    });
+
+  document.querySelectorAll(".body .ch").forEach(el =>
+    el.onclick = () => {
+      const sp = autoSpan(passage().text, +el.dataset.at);
+      lookup(sp.start, sp.end);
+    });
+
+  on("save", async () => {
+    cfg.url = document.getElementById("url").value.trim();
+    cfg.token = document.getElementById("token").value.trim();
+    saveCfg();
+    const msg = document.getElementById("setmsg");
+    msg.textContent = "確認中…";
+    try {
+      const r = await fetch(base() + "/sync", { headers: { "X-Yomi-Token": cfg.token } });
+      msg.textContent = r.ok ? "接続できました。" : r.status === 401 ? "トークンが違います。" : "サーバーが応答しません。";
+      if (r.ok) { await pull(); render(); }
+    } catch (e) { msg.textContent = "URL に到達できません。"; }
+  });
+
+  on("sync", async () => {
+    const msg = document.getElementById("setmsg");
+    msg.textContent = "同期中…";
+    await push();
+    msg.textContent = syncedAt ? "同期しました。" : "同期できませんでした。";
+  });
+
+  on("resetblock", () => {
+    S.block = SEED; S.idx = 0; S.blockAt = Date.now(); pending = null;
+    push(); view = "home"; render();
+  });
+
+  on("resetall", function () {
+    if (this.dataset.armed) {
+      S = blank(); push(); view = "home"; render();
+    } else {
+      this.dataset.armed = "1";
+      this.textContent = "本当に全消去？";
+      this.classList.add("hot");
+    }
+  });
+}
+
+document.querySelectorAll("nav button").forEach(b =>
+  b.onclick = () => {
+    view = b.dataset.v;
+    if (view === "read") enter = Date.now();
+    note = null;
+    render();
+  });
+
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible" && !busy) { await pull(); render(); }
+});
+
+/* ------------------------------ boot ------------------------------ */
+
+loadLocal();
+render();
+pull().then(() => { render(); prefetch(); });
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
 </html>
