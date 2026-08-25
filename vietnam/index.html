@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northern Vietnam — a field guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Public+Sans:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F211D;
+  --deep:#16302A;
+  --card:#1C3A33;
+  --card-hi:#22463D;
+  --line:#2E564B;
+  --mist:#EAEFE9;
+  --muted:#9DB4AC;
+  --rice:#E3A93F;
+  --jade:#6FB39B;
+  --display:'Bricolage Grotesque','Helvetica Neue',sans-serif;
+  --body:'Public Sans','Helvetica Neue',Arial,sans-serif;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+  --maxw:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--mist);
+  font-family:var(--body);font-weight:300;
+  font-size:16px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+@media(max-width:640px){.wrap{padding:0 18px}}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.05;letter-spacing:-.02em}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--jade);font-weight:600;
+}
+.lede{font-size:clamp(17px,2vw,20px);color:#C6D4CD;max-width:62ch;font-weight:300}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero-svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:.5;pointer-events:none;
+}
+.hero-inner{position:relative;padding:76px 0 60px}
+.hero h1{
+  font-size:clamp(52px,11vw,132px);font-weight:800;
+  letter-spacing:-.045em;line-height:.86;margin:20px 0 0;
+}
+.hero h1 em{font-style:normal;color:var(--rice);display:block}
+.hero .dates{
+  font-family:var(--mono);font-size:13px;color:var(--muted);
+  margin-top:26px;letter-spacing:.06em;
+}
+.hero .lede{margin-top:18px}
+
+/* ---------- sections ---------- */
+section{padding:72px 0;border-bottom:1px solid var(--line)}
+.sec-head{margin-bottom:34px}
+.sec-head h2{font-size:clamp(28px,4.2vw,42px);margin-top:10px}
+.sec-head p{margin-top:14px;color:#B5C7C0;max-width:64ch}
+
+/* ---------- range control (signature) ---------- */
+.dial{
+  background:var(--deep);border:1px solid var(--line);
+  border-radius:3px;padding:26px 28px 22px;margin-bottom:30px;
+}
+.dial-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.dial-read{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.dial-read b{color:var(--rice);font-size:26px;font-weight:600;letter-spacing:-.02em}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;
+  height:3px;background:var(--line);margin:26px 0 10px;
+  border-radius:2px;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:var(--rice);border:3px solid var(--ink);cursor:grab;
+}
+input[type=range]::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--rice);border:3px solid var(--ink);cursor:grab;border-width:3px;
+}
+input[type=range]:focus-visible{outline:2px solid var(--jade);outline-offset:6px}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.08em}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;color:var(--muted);border:1px solid var(--line);
+  padding:7px 13px;border-radius:2px;cursor:pointer;transition:.16s;
+}
+.chip:hover{color:var(--mist);border-color:var(--jade)}
+.chip[aria-pressed=true]{background:var(--jade);color:var(--ink);border-color:var(--jade);font-weight:600}
+.chip:focus-visible{outline:2px solid var(--rice);outline-offset:2px}
+
+/* ---------- place cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(324px,1fr));gap:14px}
+.place{
+  background:var(--card);border:1px solid var(--line);border-radius:3px;
+  padding:0;transition:.22s;text-align:left;width:100%;
+  color:inherit;font:inherit;cursor:pointer;display:block;
+}
+.place:hover{background:var(--card-hi);border-color:var(--jade)}
+.place:focus-visible{outline:2px solid var(--rice);outline-offset:2px}
+.place.far{opacity:.26;filter:saturate(.3)}
+.place.far:hover{opacity:.5}
+.place-top{padding:20px 22px 16px}
+.place-name{font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:-.02em;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.place-name .hrs{font-family:var(--mono);font-size:12px;color:var(--rice);font-weight:600;white-space:nowrap}
+.place-blurb{font-size:14.5px;color:#B5C7C0;margin-top:9px;line-height:1.55}
+.bar{height:2px;background:var(--line);margin:16px 22px 0;position:relative}
+.bar i{position:absolute;left:0;top:0;height:2px;background:var(--rice);display:block}
+.place-tags{display:flex;gap:6px;flex-wrap:wrap;padding:14px 22px 18px}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--jade);border:1px solid var(--line);padding:3px 7px;border-radius:2px}
+.place-detail{
+  display:none;padding:0 22px 22px;font-size:14.5px;color:#C0D0C9;
+  border-top:1px solid var(--line);margin-top:2px;padding-top:16px;
+}
+.place[aria-expanded=true] .place-detail{display:block}
+.place-detail dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-top:12px}
+.place-detail dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--rice);padding-top:3px}
+.place-detail dd{font-size:14px}
+.empty{color:var(--muted);font-family:var(--mono);font-size:13px;padding:30px 0}
+
+/* ---------- routes ---------- */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{
+  background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--muted);font-family:var(--display);font-size:17px;font-weight:600;
+  padding:13px 20px 13px 0;margin-right:26px;cursor:pointer;transition:.16s;letter-spacing:-.01em;
+}
+.tab:hover{color:var(--mist)}
+.tab[aria-selected=true]{color:var(--rice);border-bottom-color:var(--rice)}
+.tab:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.route{display:none;padding-top:30px}
+.route.on{display:block}
+.route-hd{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}
+.route-hd h3{font-size:26px}
+.route-hd span{font-family:var(--mono);font-size:12px;color:var(--rice);letter-spacing:.06em}
+.route>p{color:#B5C7C0;max-width:62ch;margin-bottom:26px}
+.leg{display:grid;grid-template-columns:74px 1fr;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+.leg-n{font-family:var(--mono);font-size:11px;color:var(--rice);letter-spacing:.1em;text-transform:uppercase;padding-top:4px}
+.leg h4{font-size:17px;margin-bottom:5px}
+.leg p{font-size:14.5px;color:#B5C7C0}
+@media(max-width:560px){.leg{grid-template-columns:1fr;gap:5px}}
+
+/* ---------- accordion ---------- */
+.acc{border-top:1px solid var(--line)}
+.acc-btn{
+  width:100%;background:none;border:none;color:var(--mist);
+  font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:-.015em;
+  text-align:left;padding:19px 40px 19px 0;cursor:pointer;position:relative;
+}
+.acc-btn:hover{color:var(--rice)}
+.acc-btn:focus-visible{outline:2px solid var(--jade);outline-offset:-2px}
+.acc-btn::after{content:'+';position:absolute;right:6px;top:17px;font-family:var(--mono);font-size:22px;color:var(--rice);font-weight:400;transition:.2s}
+.acc-btn[aria-expanded=true]::after{content:'–'}
+.acc-panel{display:none;padding:0 0 24px;max-width:70ch}
+.acc-panel.on{display:block}
+.acc-panel p{color:#B5C7C0;font-size:15px;margin-bottom:11px}
+.acc-panel ul{list-style:none;margin:10px 0}
+.acc-panel li{font-size:15px;color:#B5C7C0;padding-left:20px;position:relative;margin-bottom:9px}
+.acc-panel li::before{content:'—';position:absolute;left:0;color:var(--jade)}
+.acc-panel strong{color:var(--mist);font-weight:600}
+.flag{border-left:2px solid var(--rice);padding:2px 0 2px 16px;margin:16px 0;color:#D6E0DA;font-size:15px}
+
+/* ---------- checklist ---------- */
+.pack-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.count{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.count b{color:var(--rice);font-weight:600}
+.pack{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px}
+.item{display:flex;gap:13px;align-items:flex-start;padding:13px 14px;background:var(--deep);border:1px solid transparent;cursor:pointer;transition:.15s}
+.item:hover{background:var(--card)}
+.item input{
+  appearance:none;-webkit-appearance:none;width:17px;height:17px;flex:0 0 17px;
+  border:1px solid var(--jade);border-radius:2px;margin-top:3px;cursor:pointer;position:relative;background:transparent;
+}
+.item input:checked{background:var(--rice);border-color:var(--rice)}
+.item input:checked::after{content:'';position:absolute;left:5px;top:1px;width:4px;height:9px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(42deg)}
+.item input:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.item span{font-size:14.5px;color:#C0D0C9;transition:.15s}
+.item input:checked+span{color:var(--muted);text-decoration:line-through}
+
+/* ---------- misc ---------- */
+.note{background:var(--deep);border:1px solid var(--line);border-left:2px solid var(--rice);padding:20px 22px;border-radius:2px;margin-top:26px}
+.note p{font-size:14.5px;color:#C0D0C9}
+.note b{color:var(--rice);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:7px;font-weight:600}
+footer{padding:44px 0 60px;color:var(--muted);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;line-height:1.9}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="hero-svg" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="#2E564B" stroke-width="1">
+      <path d="M-40 340 C 160 300, 250 372, 420 336 S 720 268, 900 312 S 1150 350, 1250 318"/>
+      <path d="M-40 316 C 150 274, 258 348, 424 308 S 716 238, 902 284 S 1152 324, 1250 292"/>
+      <path d="M-40 292 C 142 248, 266 324, 428 280 S 712 208, 904 256 S 1154 298, 1250 266"/>
+      <path d="M-40 266 C 134 220, 274 298, 432 250 S 708 176, 906 226 S 1156 270, 1250 238"/>
+      <path d="M-40 238 C 126 190, 282 270, 436 218 S 704 142, 908 194 S 1158 240, 1250 208"/>
+      <path d="M-40 208 C 118 158, 290 240, 440 184 S 700 106, 910 160 S 1160 208, 1250 176"/>
+      <path d="M-40 176 C 110 124, 298 208, 444 148 S 696 68, 912 124 S 1162 174, 1250 142"/>
+      <path d="M-40 142 C 102 88, 306 174, 448 110 S 692 28, 914 86 S 1164 138, 1250 106"/>
+      <path d="M-40 106 C 94 50, 314 138, 452 70 S 688 -14, 916 46 S 1166 100, 1250 68"/>
+    </g>
+  </svg>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">A field guide</div>
+    <h1>Northern<br>Vietnam<em>on foot</em></h1>
+    <div class="dates">3 – 10 October &nbsp;·&nbsp; Hanoi and everything within a day of it</div>
+    <p class="lede">Karst mountains, terraced valleys, and a lot of walking. This is a guide to the north in the best week of its year — what's out there, how far it is, and which combinations actually work in eight days.</p>
+  </div>
+</header>
+
+<section id="places">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Where to go</div>
+      <h2>Everything is measured from Hanoi</h2>
+      <p>The north has one hub and one real constraint: how long you're willing to sit in a vehicle. Pull the slider to set your limit, and filter by what you actually want to do. Tap any place to open it.</p>
+    </div>
+
+    <div class="dial">
+      <div class="dial-top">
+        <div class="eyebrow">Maximum travel from Hanoi</div>
+        <div class="dial-read"><b id="hrsOut">8</b> hours one way</div>
+      </div>
+      <input type="range" id="hrs" min="1" max="8" step="0.5" value="8" aria-label="Maximum hours of travel from Hanoi">
+      <div class="ticks"><span>1H</span><span>3H</span><span>5H</span><span>8H</span></div>
+      <div class="chips" id="chips" role="group" aria-label="Filter by activity">
+        <button class="chip" data-tag="Hiking" aria-pressed="false">Hiking</button>
+        <button class="chip" data-tag="Cycling" aria-pressed="false">Cycling</button>
+        <button class="chip" data-tag="On the water" aria-pressed="false">On the water</button>
+        <button class="chip" data-tag="Neighborhoods" aria-pressed="false">Neighborhoods</button>
+        <button class="chip" data-tag="Quiet" aria-pressed="false">Few visitors</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>Nothing matches. Widen the range or drop a filter.</p>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Four ways to do it</div>
+      <h2>Worked routes</h2>
+      <p>Each of these is a block you can drop into the week, with Hanoi as the hinge on either side. Roughly in order: the first is the easiest to pull off, the second the most spectacular, the third the most weather-proof, and the fourth the best-known.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-route="r1">Valleys &amp; terraces</button>
+      <button class="tab" role="tab" aria-selected="false" data-route="r2">The far north</button>
+      <button class="tab" role="tab" aria-selected="false" data-route="r3">Karst &amp; water</button>
+      <button class="tab" role="tab" aria-selected="false" data-route="r4">Sapa</button>
+    </div>
+
+    <div class="route on" id="r1">
+      <div class="route-hd"><h3>Pù Luông and Mai Châu</h3><span>4 days · 4h out</span></div>
+      <p>The best fit if the priority is walking. October catches the tail of the second rice harvest here, and the trekking is valley-to-valley rather than summit-bagging — you walk through farmland and villages rather than past them.</p>
+      <div class="leg"><div class="leg-n">Day 1</div><div><h4>Hanoi to Pù Luông</h4><p>Leave early; it's about four hours by private car. Arrive for lunch. Ease in with the Bản Đôn valley loop — five or six flat kilometres through the paddies and past the bamboo waterwheels. Good at either end of the day.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 2</div><div><h4>Kho Mường and the Bat Cave</h4><p>The main trek: roughly ten kilometres over a ridge and down into a hidden valley, finishing at Hang Dơi. Moderate, and worth a local guide — a lot of the trails aren't on any map.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 3</div><div><h4>Hiếu village and waterfall</h4><p>A gentler valley walk to a run of limestone cascades with pools you can swim in. Afternoon free. If it's a Sunday, the Phố Đoàn market is worth building the day around.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 4</div><div><h4>Back via Mai Châu</h4><p>Break the return in the Mai Châu valley — flat, ringed by mountains, and ideal for a few hours on a rented bicycle before the last stretch into Hanoi.</p></div></div>
+    </div>
+
+    <div class="route" id="r2">
+      <div class="route-hd"><h3>Hà Giang or Cao Bằng</h3><span>4 days · 7h out</span></div>
+      <p>The most dramatic landscape in the country, and the biggest commitment. Overnight buses each way are standard. Hà Giang has the famous passes and the crowds that come with them; Cao Bằng has smoother roads, bigger water, and far fewer people.</p>
+      <div class="leg"><div class="leg-n">Night 1</div><div><h4>Sleeper bus north</h4><p>Around seven hours, leaving Hanoi in the evening and arriving before dawn. Book a limousine van rather than a bus berth if you'd like to arrive functional.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 1</div><div><h4>Into the mountains</h4><p>Hà Giang: north through Quản Bạ toward Yên Minh or Du Già. Cao Bằng: out to Nguyên Bình and the Phia Oắc highlands. Either way, hire a driver or a local easy-rider — the roads are the attraction and you'll see more from the back.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 2</div><div><h4>The set piece</h4><p>Hà Giang: Đồng Văn, Lũng Cú at the northern tip, then the Mã Pí Lèng pass above the Nho Quế gorge. Cao Bằng: Bản Giốc waterfall, at high post-monsoon flow but with the water already cleared to turquoise.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 3</div><div><h4>Walk, then turn south</h4><p>There's real hiking here beyond the roads — down into the gorge, or between the villages around Du Già and Khuổi Ky. Evening bus back to Hanoi.</p></div></div>
+      <div class="leg"><div class="leg-n">Note</div><div><h4>Border permits</h4><p>Foreign visitors need a Border Area Entry Permit for Hà Giang's northern districts — Quản Bạ, Yên Minh, Đồng Văn and Mèo Vạc. It's about 250,000₫, arranged in Hà Giang City, and now checked at roadblocks. Any decent operator includes it; get that confirmed in writing.</p></div></div>
+    </div>
+
+    <div class="route" id="r3">
+      <div class="route-hd"><h3>Cát Bà, Lan Hạ and Hải Phòng</h3><span>3 days · 3h out</span></div>
+      <p>Jungle trekking, sea kayaking, and a colonial port city almost nobody stops in. The shortest travel times of the three, which also makes it the fallback if a storm system shows up in the forecast.</p>
+      <div class="leg"><div class="leg-n">Day 1</div><div><h4>Hải Phòng</h4><p>Two hours from Hanoi by road. Wide boulevards, a French opera house, and some of the best regional food in the north — bánh đa cua, bánh mì cay, chả chìa. An evening of walking is the whole point.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 2</div><div><h4>Cát Bà National Park</h4><p>Speedboat across in under an hour. Trek up to Ngũ Lâm peak for the view over the archipelago, or take the longer crossing through the park to Ao Ếch, the island's freshwater lake.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 3</div><div><h4>Lan Hạ Bay</h4><p>A full day on the water — boat out, then kayaks through the lagoons and sea caves, with lunch at Việt Hải, a village inside the park you can only reach by boat or bike. Same karst as Ha Long, a fraction of the traffic.</p></div></div>
+    </div>
+
+    <div class="route" id="r4">
+      <div class="route-hd"><h3>Sapa and the Mường Hoa valley</h3><span>4 days · overnight train</span></div>
+      <p>The distance is the objection people raise, and the sleeper train mostly answers it — you travel while asleep instead of losing a day to the road. The other objection, that Sapa is overrun, is fair about the town and wrong about the valley. Stay down among the terraces and it's a different trip.</p>
+      <div class="leg"><div class="leg-n">Night 1</div><div><h4>Sleeper train to Lào Cai</h4><p>Leaves Hanoi late evening, arrives around dawn, roughly eight hours in a four-berth cabin. Book a soft sleeper. From Lào Cai it's about an hour by road up to the valley.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 1</div><div><h4>Down into the valley</h4><p>Skip the town and go straight to Tả Van or Lao Chải. Drop bags, then walk the terraces in the afternoon — the paths run village to village along the valley floor and up the sides.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 2</div><div><h4>The long trek</h4><p>A full day, 12–15km, through Hmong and Dao villages and across the Mường Hoa terraces. Guides are easy to arrange locally and worth it; a lot of the good routes aren't obvious.</p></div></div>
+      <div class="leg"><div class="leg-n">Day 3</div><div><h4>Fansipan, or a second valley</h4><p>Either take the cable car up Indochina's highest mountain — 3,143m, a few minutes each way — or stay low and walk a different valley. Evening train back, arriving Hanoi early the next morning.</p></div></div>
+      <div class="leg"><div class="leg-n">Note</div><div><h4>Timing</h4><p>The Sapa harvest peaks mid-September, so early October catches the tail of it. Terraces will be cut in places and gold in others rather than uniformly gold. Pù Luông, with its later second harvest, is the better bet if that's the specific thing you're after.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="cycling">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">On two wheels</div>
+      <h2>Cycling</h2>
+      <p>Bikes are cheap and widely rentable, and four areas in the north are genuinely good riding — flat or rolling, lightly trafficked, and scenic the whole way. Skip the national highways entirely; Highway 1A in particular is no place for a bicycle.</p>
+    </div>
+    <div class="grid">
+      <div class="place" style="cursor:default">
+        <div class="place-top">
+          <div class="place-name">Ninh Bình <span class="hrs">EASY · FLAT</span></div>
+          <p class="place-blurb">The best of the four. Paved back lanes thread between limestone towers and flooded paddies, linking Tam Cốc, Bích Động and the Hang Múa steps. Start by seven — the roads are empty and the light is better.</p>
+        </div>
+      </div>
+      <div class="place" style="cursor:default">
+        <div class="place-top">
+          <div class="place-name">Mai Châu <span class="hrs">EASY · FLAT</span></div>
+          <p class="place-blurb">A flat valley floor ringed by mountains, with stilt-house villages strung along the lanes between rice fields. A couple of hours gets you around the whole thing. Bikes come free with most homestays.</p>
+        </div>
+      </div>
+      <div class="place" style="cursor:default">
+        <div class="place-top">
+          <div class="place-name">Cát Bà Island <span class="hrs">MODERATE · HILLY</span></div>
+          <p class="place-blurb">The island road climbs and drops through the national park, with a spur down to Việt Hải village. Short distances, real gradients, and coastal views most of the way.</p>
+        </div>
+      </div>
+      <div class="place" style="cursor:default">
+        <div class="place-top">
+          <div class="place-name">Red River dykes <span class="hrs">EASY · FLAT</span></div>
+          <p class="place-blurb">Raised embankment roads running out of Hanoi through market gardens and brick kilns. You can be out of the city in twenty minutes and into farmland that feels an hour away.</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <p><b>Worth knowing</b>Pù Luông is rideable but steep, and better on foot. The far-north loops — Hà Giang and Cao Bằng — are motorbike country: sustained climbs, hairpins, and heavy vehicle traffic on the passes. Go by car or easy-rider up there and save the bicycle for the valleys. Bring your own helmet if you're particular; rental ones are usually token.</p>
+    </div>
+  </div>
+</section>
+
+<section id="weather">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Timing</div>
+      <h2>Why October, and the one caveat</h2>
+      <p>Early October is one of the two best windows in the northern year. The southwest monsoon has broken, Hanoi sits around 20–28°C with roughly nine rainy days across the whole month, trails are dry, and the rice harvest is finishing — which is what turns the terraces gold.</p>
+    </div>
+    <div class="note">
+      <p><b>The caveat</b>October is still inside typhoon season in the north. In October 2025 a storm crossed the Vietnam–China border on the 6th to 8th, Hanoi recorded over 200mm of rain in a day, and several northern provinces flooded. That was a severe year rather than a typical one, but it's a real reason to keep the closer options — Ninh Bình and Cát Bà, both within three hours — genuinely available, and to watch the forecast in the ten days beforehand.</p>
+    </div>
+    <div class="note">
+      <p><b>Skip the centre</b>Huế, Đà Nẵng and Hội An are in their wet season from September through December, at its worst in October and November. Hội An floods most years. It's also the standard tourist route, so nothing is lost by staying north.</p>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Before you go</div>
+      <h2>Staying out of trouble</h2>
+      <p>Vietnam sits in the lowest advisory tier from both the US State Department and the UK FCDO. Violent crime against visitors is rare. The genuine risks, in order, are traffic, weather, and money.</p>
+    </div>
+    <div class="acc" id="acc">
+      <div>
+        <button class="acc-btn" aria-expanded="false">Traffic — the actual danger</button>
+        <div class="acc-panel">
+          <p>This outweighs everything else on the list. Vietnam's road death rate is around 24.5 per 100,000, above the regional average.</p>
+          <ul>
+            <li><strong>Crossing on foot:</strong> walk at a slow, steady, predictable pace and don't stop. Traffic flows around you. Stopping or sprinting is what causes collisions.</li>
+            <li><strong>On a bicycle:</strong> stay on rural lanes and dyke roads, ride defensively at junctions, and assume you have not been seen. Avoid national highways.</li>
+            <li><strong>After dark:</strong> don't ride or cycle mountain roads at night, and avoid them in rain — the surface goes slick and the drops are unforgiving.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <button class="acc-btn" aria-expanded="false">Petty theft</button>
+        <div class="acc-panel">
+          <p>Phone and bag snatching from passing motorbikes is the most common incident with any physical risk attached — more frequent in Ho Chi Minh City but present in Hanoi.</p>
+          <ul>
+            <li>Carry bags on the side away from traffic.</li>
+            <li>Don't stand at a curb navigating on your phone. Step back from the road first.</li>
+            <li>Crowded markets and the Old Quarter at night are where pickpocketing concentrates.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <button class="acc-btn" aria-expanded="false">Scams</button>
+        <div class="acc-panel">
+          <ul>
+            <li><strong>Fake e-visa sites.</strong> Convincing replicas of the government portal rank high in search results and either massively overcharge or harvest your identity. Type the official Immigration Department URL directly rather than clicking through a search.</li>
+            <li><strong>Ghost accommodation.</strong> AI-generated listings for properties that don't exist, posted on otherwise legitimate booking platforms. Cross-check reviews and street view.</li>
+            <li><strong>Taxis.</strong> Use Grab and confirm the driver's name and plate before getting in. Unlicensed drivers work airport arrivals hard.</li>
+            <li><strong>Tampered QR codes</strong> at tourist sites, redirecting to phishing pages. Prefer cash or in-app payment.</li>
+            <li><strong>Old Quarter touts</strong>, especially budget Ha Long cruise sellers around Tạ Hiện and Hoàn Kiếm. Book through your accommodation.</li>
+            <li><strong>"It's closed today."</strong> It isn't. Walk past and check the gate.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <button class="acc-btn" aria-expanded="false">Health</button>
+        <div class="acc-panel">
+          <ul>
+            <li><strong>Dengue is endemic.</strong> DEET repellent, particularly at dawn and dusk and in rural areas.</li>
+            <li><strong>Hanoi air quality</strong> is poor in autumn. Check the index before long walks if either of you is asthmatic.</li>
+            <li>Bottled water. Ice in cities and established restaurants is generally fine.</li>
+            <li><strong>Travel insurance with medical evacuation cover is not optional.</strong> Several of these places are hours from a serious hospital. Confirm the policy covers hiking and cycling.</li>
+            <li>In Hanoi, Family Medical Practice and Hồng Ngọc both treat foreign patients.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <button class="acc-btn" aria-expanded="false">Weather and border areas</button>
+        <div class="acc-panel">
+          <p>In the mountains the risk is water, not wind — flash floods and landslides. Never walk or drive through flood water, and take road closures at face value.</p>
+          <p>Cao Bằng and Hà Giang both run along the Chinese border. Carry your passport, carry the permit where one is required, stay on marked routes near the frontier, and note that drone use is restricted in border zones.</p>
+          <div class="flag">Emergency numbers — police 113 · fire 114 · ambulance 115</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="prep">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Admin</div>
+      <h2>Before the flight</h2>
+      <p>Most of this is quick, but the visa has a lead time and October is peak season in the north — homestays in Pù Luông and transport to Hà Giang both sell out.</p>
+    </div>
+    <div class="pack-top">
+      <div class="eyebrow">Checklist</div>
+      <div class="count"><b id="done">0</b> of <span id="total">0</span> done</div>
+    </div>
+    <div class="pack" id="pack"></div>
+    <div class="note">
+      <p><b>Visa</b>US and Canadian citizens are not visa-exempt. The 90-day e-visa costs US$25 for single entry and takes three to five working days, so apply by mid-September. Your declared port of entry has to match where you actually land. Use the official portal only. Passport needs six months' validity and two blank pages.</p>
+    </div>
+    <div class="note">
+      <p><b>Arrival card</b>Vietnam introduced a mandatory digital pre-arrival declaration in April 2026 and has been rolling it out airport by airport. Whether it applies at Nội Bài is worth checking close to the date — the submission window only opens 72 hours before arrival.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    NORTHERN VIETNAM · 3–10 OCTOBER<br>
+    Conditions, permits and entry rules change. Verify anything time-sensitive before you travel.
+  </div>
+</footer>
+
+<script>
+const PLACES = [
+  {n:'Tây Hồ, Hanoi', h:0, t:['Neighborhoods'], b:'The calm side of the capital — a lake ringed by low-rise streets, independent cafés and a 15km shoreline loop. Better base than the Old Quarter by a wide margin.',
+   d:'Quảng An, Tứ Liên and Nhật Tân are the neighbourhoods worth wandering, especially around Tô Ngọc Vân street. Elsewhere in Hanoi: Trúc Bạch and Ngũ Xã on the small peninsula between two lakes; the riverside strip at Phúc Tân under Long Biên bridge; and Bãi Giữa, the sandbar island in the Red River with market gardens on it, reached on foot from the bridge and best at sunrise.',
+   f:{'Getting there':'You are already there','Worth a day':'Đường Lâm ancient village, 1.5h west'}},
+  {n:'Ninh Bình', h:2, t:['Hiking','Cycling','On the water'], b:'Limestone towers rising straight out of rice paddies and slow rivers. Two hours from Hanoi, and the only place on this list that does boats, bikes and hiking all at once.',
+   d:'Two boat options, and they are not the same. Tràng An is the longer one — around three hours, rowed through a chain of flooded caves, with three routes to choose between and a fixed price. Tam Cốc is shorter, prettier in places, and comes with more pressure to tip and buy things mid-river. Take Tràng An, go at opening, pick route three for the fewest people. On land: bicycles on the back lanes between Tam Cốc, Bích Động and Hang Múa, which has around 500 steps up to a ridge with the best view in the area. Cúc Phương National Park is 40 minutes further on. Connectivity is solid in Ninh Bình town hotels and patchier at rural homestays, so bring a phone hotspot as backup if it matters.',
+   f:{'Getting there':'2h by train, bus or car','Give it':'2–3 days','Best time':'First light. It changes character by 10am'}},
+  {n:'Hải Phòng', h:2, t:['Neighborhoods','Quiet'], b:'A French colonial port city that almost no foreign traveller stops in. Wide boulevards, an opera house, and food worth the trip on its own.',
+   d:'Bánh đa cua — a crab and red noodle soup — is the local dish, along with bánh mì cay, a finger-thin chilli baguette, and chả chìa. The colonial quarter is compact and entirely walkable. It also doubles as the mainland gateway to Cát Bà, with fast boats crossing in under an hour.',
+   f:{'Getting there':'2h by road or train','Pairs with':'Cát Bà'}},
+  {n:'Cúc Phương', h:2.5, t:['Hiking','Quiet'], b:"Vietnam's oldest national park. Old-growth jungle, thousand-year-old trees, prehistoric caves and an endangered primate rescue centre.",
+   d:'Trails range from short loops to a 6km route through the ancient trees; some require a guide. The park road runs 20km in and you return the same way, so budget for the distance. Very few foreign visitors, and the primate centre is a legitimate conservation operation rather than a photo op.',
+   f:{'Getting there':'2.5h by car','Pairs with':'Ninh Bình'}},
+  {n:'Cát Bà & Lan Hạ Bay', h:3, t:['Hiking','Cycling','On the water'], b:'The honest version of Ha Long — the same karst seascape with a fraction of the boat traffic, plus a jungle-covered island to hike across.',
+   d:'Lan Hạ has over 300 limestone islands, hidden lagoons and sea caves, best seen by kayak. On land, Cát Bà National Park is a UNESCO biosphere reserve: the trek to Ngũ Lâm peak gives the panorama, and a longer crossing reaches Ao Ếch, the island\u2019s largest freshwater lake. Việt Hải, a village inside the park, is reachable only by boat or bicycle.',
+   f:{'Getting there':'3h via Hải Phòng','Give it':'2–3 days'}},
+  {n:'Hạ Long & Bái Tử Long', h:3, t:['On the water'], b:'The famous one. Genuinely astonishing geology, and also the most heavily trafficked water in Vietnam — hundreds of boats working a handful of identical routes.',
+   d:'The overnight cruise is the standard way to do it: board around midday, cruise, kayak, eat a set dinner, sleep aboard, return by late morning. It is a fixed two-day commitment on someone else\u2019s schedule, and the budget end of the market is where most of the complaints come from. Two better versions of the same idea: an overnight boat in Lan Hạ Bay departing from Cát Bà, which has the same karst with a fraction of the traffic, or Bái Tử Long to the northeast, which sees very few foreign boats at all. Quan Lạn and Cô Tô islands out that way are quieter still. One practical risk — the port authority suspends all sailings in bad weather, so a booked cruise can simply be cancelled.',
+   f:{'Getting there':'2.5h by expressway','Give it':'2 days','Better version':'Lan Hạ overnight from Cát Bà'}},
+  {n:'Mai Châu', h:3.5, t:['Hiking','Cycling'], b:'A flat valley floor ringed by mountains, with Thái stilt-house villages along the lanes. Easy, gentle, and a natural stop en route to Pù Luông.',
+   d:'The riding and walking here are as undemanding as northern Vietnam gets — a few hours on a bicycle covers the whole valley. More visited than Pù Luông but still calm, and most homestays include bikes.',
+   f:{'Getting there':'3.5h by car','Give it':'1 day'}},
+  {n:'Bắc Sơn Valley', h:3.5, t:['Hiking','Quiet'], b:'A flat patchwork of rice fields inside a ring of karst, with a short climb to a viewpoint above it. Almost entirely domestic visitors.',
+   d:'The valley is the attraction — a geometric mosaic of paddies best seen from the hill trail above the town. Very little tourist infrastructure, which is the point. Lạng Sơn province, northeast of Hanoi.',
+   f:{'Getting there':'3.5h by car','Give it':'1 day'}},
+  {n:'Pù Luông', h:4, t:['Hiking','Cycling','Quiet'], b:'Terraced valleys, Thái stilt houses and bamboo waterwheels. The best trekking within half a day of Hanoi, and the terraces should be gold in early October.',
+   d:'Two harvests a year, the second running September into early October. Walking here connects villages — Bản Đôn, Kho Mường, Hiếu, Uôi, Lặn — on routes of 6 to 14km a day at moderate difficulty. The Pù Luông summit at 1,700m is the one genuinely hard option and needs a guide and a full day. Many trails are unmarked, so a local guide is worth the small cost. The Phố Đoàn market runs on Sundays.',
+   f:{'Getting there':'4h by car','Give it':'3–4 days'}},
+  {n:'Ba Bể National Park', h:5.5, t:['Hiking','On the water','Quiet'], b:'A large freshwater lake in a bowl of karst and jungle, with Tày stilt-house homestays along the shore. The gentlest of the far-north options.',
+   d:'Kayaking, caves, waterfalls and lakeside village-to-village walking, typically around 12km a day. Very few foreign visitors. Often combined with Cao Bằng on a longer northeastern loop; on its own it works as a quieter substitute for Hà Giang.',
+   f:{'Getting there':'5–6h by car','Give it':'2–3 days'}},
+  {n:'Sapa & the Mường Hoa valley', h:6, t:['Hiking'], b:'The most famous trekking in Vietnam, and the best-served. Huge terraced valleys, Hmong and Dao villages, and the highest mountain in Indochina above it.',
+   d:'The town itself has been heavily developed — hotels, a cable car, and persistent selling in the market. The trekking, though, is genuinely excellent and easy to escape into. Stay down in the valley at Tả Van or Lao Chải rather than up in town, and walk the Mường Hoa terraces between villages; routes run 10–15km a day at moderate difficulty. Fansipan at 3,143m is reachable by cable car in minutes or on foot in two hard days. Take the overnight sleeper train to Lào Cai instead of the road — it is more comfortable than a bus and it costs you a night rather than a day.',
+   f:{'Getting there':'Overnight train to Lào Cai + 1h, or 5–6h by road','Give it':'3–4 days','Stay in':'Tả Van or Lao Chải, not Sapa town'}},
+  {n:'Mù Cang Chải & Tà Xùa', h:6.5, t:['Hiking','Quiet'], b:'The most dramatic rice terraces in the country, with harvest running mid-September into early October. Tà Xùa is the cloud-sea ridge nearby.',
+   d:'Steeper and vaster than Pù Luông, and far less developed than Sapa. Tà Xùa, in Sơn La province, is known for inversions that fill the valleys with cloud below the ridgeline — best at dawn. A long drive for a narrow seasonal window.',
+   f:{'Getting there':'6–7h by car','Give it':'3 days'}},
+  {n:'Y Tý & Bắc Hà', h:7, t:['Hiking','Quiet'], b:'Same province as Sapa, a fraction of the visitors. Y Tý sits on the Chinese border with Hà Nhì villages, terraces and cloud inversions; Bắc Hà has a working Sunday market rather than a staged one.',
+   d:'This is where to go if the Sapa landscape appeals but the infrastructure around it does not. Y Tý sees very few foreign visitors and the trekking runs between villages rather than up a summit. The trade-off is another hour or two of driving past Lào Cai and much thinner accommodation, so it needs more planning than Sapa does.',
+   f:{'Getting there':'6–8h by road','Give it':'3 days'}},
+  {n:'Hà Giang', h:7, t:['Hiking'], b:'The most spectacular landscape in Vietnam: the Đồng Văn karst plateau, cliff-cut roads, and the Mã Pí Lèng pass above the Nho Quế gorge.',
+   d:'It has also become a circuit — expect convoys of riders on the main sections and loud homestays in the towns. The workaround is to go deliberately: hire a private driver or easy-rider and sleep in Du Già or Mèo Vạc rather than Đồng Văn. Buckwheat flowers open in October. Foreign visitors need a Border Area Entry Permit for the northern districts.',
+   f:{'Getting there':'6–7h by sleeper bus','Give it':'3–4 days','Permit':'~250,000₫, arranged in Hà Giang City'}},
+  {n:'Cao Bằng', h:7.5, t:['Hiking','On the water','Quiet'], b:'The quieter alternative to Hà Giang, and increasingly the better one. River valleys, mountain villages, and Bản Giốc — one of the largest waterfalls in Asia.',
+   d:'Roads are smoother and wider than Hà Giang\u2019s with far fewer people on them. October is the ideal month for Bản Giốc: post-monsoon flow is still high but the water has cleared to turquoise. Add Nguyên Bình and the Phia Oắc highlands for mountain villages, and Khuổi Ky for stone-house homestays.',
+   f:{'Getting there':'7–8h by sleeper bus','Give it':'3–4 days'}}
+];
+
+const PACK = [
+  'Apply for e-visa (by mid-September)',
+  'Check passport validity — 6 months, 2 blank pages',
+  'Travel insurance covering hiking and cycling',
+  'Book Pù Luông or Hà Giang transport and homestays',
+  'Confirm border permit in writing if going to Hà Giang',
+  'Install and set up Grab before landing',
+  'eSIM or local SIM',
+  'Download offline maps for the northern provinces',
+  'Hiking shoes with real grip',
+  'Layers — mountain evenings get cool',
+  'DEET repellent and a rain shell',
+  'Cash — ATMs thin out on the loops'
+];
+
+/* ---- render places ---- */
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+PLACES.forEach((p,i)=>{
+  const el = document.createElement('button');
+  el.className='place'; el.setAttribute('aria-expanded','false'); el.dataset.h=p.h; el.dataset.t=p.t.join('|');
+  const rows = Object.entries(p.f).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('');
+  el.innerHTML=`
+    <div class="place-top">
+      <div class="place-name">${p.n}<span class="hrs">${p.h===0?'HUB':p.h+'H'}</span></div>
+      <p class="place-blurb">${p.b}</p>
+    </div>
+    <div class="bar"><i style="width:${Math.max(3,(p.h/8)*100)}%"></i></div>
+    <div class="place-tags">${p.t.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="place-detail"><p>${p.d}</p><dl>${rows}</dl></div>`;
+  el.addEventListener('click',()=>{
+    const open = el.getAttribute('aria-expanded')==='true';
+    el.setAttribute('aria-expanded', String(!open));
+  });
+  grid.appendChild(el);
+});
+
+/* ---- filtering ---- */
+const hrs = document.getElementById('hrs'), out = document.getElementById('hrsOut');
+let active = new Set();
+
+function apply(){
+  const max = parseFloat(hrs.value);
+  out.textContent = Number.isInteger(max) ? max : max.toFixed(1);
+  let shown = 0;
+  document.querySelectorAll('.place[data-h]').forEach(el=>{
+    const h = parseFloat(el.dataset.h);
+    const tags = el.dataset.t.split('|');
+    const tagOk = active.size===0 || [...active].every(t=>tags.includes(t));
+    if(!tagOk){ el.hidden = true; return; }
+    el.hidden = false;
+    el.classList.toggle('far', h>max);
+    if(h<=max) shown++;
+  });
+  empty.hidden = shown>0;
+}
+hrs.addEventListener('input', apply);
+
+document.querySelectorAll('.chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    const t=c.dataset.tag, on=c.getAttribute('aria-pressed')==='true';
+    c.setAttribute('aria-pressed', String(!on));
+    on ? active.delete(t) : active.add(t);
+    apply();
+  });
+});
+apply();
+
+/* ---- route tabs ---- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));
+    document.querySelectorAll('.route').forEach(x=>x.classList.remove('on'));
+    t.setAttribute('aria-selected','true');
+    document.getElementById(t.dataset.route).classList.add('on');
+  });
+});
+
+/* ---- accordion ---- */
+document.querySelectorAll('.acc-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const on = b.getAttribute('aria-expanded')==='true';
+    b.setAttribute('aria-expanded', String(!on));
+    b.nextElementSibling.classList.toggle('on', !on);
+  });
+});
+
+/* ---- checklist ---- */
+const pack = document.getElementById('pack'), done = document.getElementById('done');
+document.getElementById('total').textContent = PACK.length;
+PACK.forEach((txt,i)=>{
+  const l=document.createElement('label'); l.className='item';
+  l.innerHTML=`<input type="checkbox"><span>${txt}</span>`;
+  l.querySelector('input').addEventListener('change',()=>{
+    done.textContent = pack.querySelectorAll('input:checked').length;
+  });
+  pack.appendChild(l);
+});
+</script>
+</body>
+</html>
