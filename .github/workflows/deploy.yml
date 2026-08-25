@@ -27,6 +27,8 @@ jobs:
           mkdir -p site
           cp index.html manifest.webmanifest sw.js site/
           [ -f icon.svg ] && cp icon.svg site/ || true
+          # Standalone pages served alongside the app
+          [ -d vietnam ] && cp -r vietnam site/ || true
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
